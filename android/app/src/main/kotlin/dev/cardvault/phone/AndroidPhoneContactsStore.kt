@@ -27,10 +27,10 @@ class AndroidPhoneContactsStore(context: Context) : PhoneContactsStore {
 
     override suspend fun readAll(): List<PhoneContact> = withContext(Dispatchers.IO) {
         val account = account() ?: return@withContext emptyList()
-        class Raw(val id: Long, val sourceId: String?, val deleted: Boolean)
+        class Raw(val id: Long, val sourceId: String?, val deleted: Boolean, val dirty: Boolean)
 
         val raws = ArrayList<Raw>()
-        val projection = arrayOf(RawContacts._ID, RawContacts.SOURCE_ID, RawContacts.DELETED)
+        val projection = arrayOf(RawContacts._ID, RawContacts.SOURCE_ID, RawContacts.DELETED, RawContacts.DIRTY)
         resolver.query(
             syncUri(RawContacts.CONTENT_URI, account),
             projection,
@@ -38,7 +38,7 @@ class AndroidPhoneContactsStore(context: Context) : PhoneContactsStore {
             arrayOf(account.name, account.type),
             "${RawContacts._ID} ASC",
         )?.use { c ->
-            while (c.moveToNext()) raws += Raw(c.getLong(0), c.getString(1), c.getInt(2) != 0)
+            while (c.moveToNext()) raws += Raw(c.getLong(0), c.getString(1), c.getInt(2) != 0, c.getInt(3) != 0)
         }
         val rows = ContactRowMapper.readRows(
             resolver,
@@ -51,6 +51,7 @@ class AndroidPhoneContactsStore(context: Context) : PhoneContactsStore {
                 sourceId = raw.sourceId,
                 deleted = raw.deleted,
                 contact = ContactRowMapper.toContact(raw.sourceId.orEmpty(), 0L, rows[raw.id].orEmpty()),
+                dirty = raw.dirty,
             )
         }
     }
@@ -66,6 +67,8 @@ class AndroidPhoneContactsStore(context: Context) : PhoneContactsStore {
             val batch = Batch()
             for (raw in current) {
                 val uid = raw.sourceId?.takeIf { it.isNotEmpty() } ?: assignedUids[raw.rawContactId]
+                // A raw contact without a source id that the mirror did not take (it has no content) stays as it is.
+                if (uid == null && !raw.deleted) continue
                 if (raw.deleted || uid == null || uid !in targetUids || matched.containsKey(uid)) {
                     batch.add(1) { listOf(deleteRaw(rawUri, raw.rawContactId)) }
                 } else {
@@ -115,6 +118,26 @@ class AndroidPhoneContactsStore(context: Context) : PhoneContactsStore {
                             rows.forEach { add(insertRow(dataUri, it).withValue(ContactsContract.Data.RAW_CONTACT_ID, raw.rawContactId).build()) }
                         }
                     }
+                }
+            }
+            batch.flush()
+        }
+    }
+
+    override suspend fun clearDirty(rawContactIds: Collection<Long>) {
+        if (rawContactIds.isEmpty()) return
+        withContext(Dispatchers.IO) {
+            val account = account() ?: return@withContext
+            val rawUri = syncUri(RawContacts.CONTENT_URI, account)
+            val batch = Batch()
+            for (id in rawContactIds) {
+                batch.add(1) {
+                    listOf(
+                        ContentProviderOperation.newUpdate(rawUri)
+                            .withSelection("${RawContacts._ID}=?", arrayOf(id.toString()))
+                            .withValue(RawContacts.DIRTY, 0)
+                            .build(),
+                    )
                 }
             }
             batch.flush()

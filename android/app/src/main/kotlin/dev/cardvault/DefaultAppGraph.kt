@@ -59,9 +59,22 @@ class DefaultAppGraph(private val app: Application) : AppGraph {
     override val auth: AuthService get() = authService
     override val contacts: ContactsRepository get() = local
     override val conflicts: ConflictRepository get() = conflictStore
-    override val sync: SyncController get() = workSync
+    override val sync: SyncController get() = gatedSync
     override val phoneSync: PhoneSyncSettings get() = phoneAccounts
     override val importer: ImportService = DeviceImportService(app, local, clock)
+
+    // Sync triggers do nothing while nobody is signed in. The foreground loop starts at sign-in when the UI is visible.
+    private val gatedSync = object : SyncController {
+        @Volatile private var foreground = false
+        override val status get() = workSync.status
+        override fun requestSync() { if (signedIn()) workSync.requestSync() }
+        override fun onLocalEdit() { if (signedIn()) workSync.onLocalEdit() }
+        override fun setForeground(foreground: Boolean) {
+            this.foreground = foreground
+            workSync.setForeground(foreground && signedIn())
+        }
+        fun refresh() = workSync.setForeground(foreground && signedIn())
+    }
 
     init {
         stateStore.state.let { syncStatus.value = SyncStatus(lastSyncAt = it.lastSyncAt, lastError = it.lastError) }
@@ -72,9 +85,12 @@ class DefaultAppGraph(private val app: Application) : AppGraph {
                     AuthState.SignedOut -> workSync.cancelAll()
                     else -> Unit
                 }
+                gatedSync.refresh()
             }
         }
     }
+
+    private fun signedIn() = authService.state.value is AuthState.SignedIn
 
     /** Runs one sync. A sync before the session restore completes waits for it. */
     suspend fun runSync(): SyncOutcome {

@@ -241,16 +241,20 @@ fun DiffTable(
 
 @Composable
 private fun TableRow(label: String, cells: List<String>, changed: Boolean, header: Boolean) {
-    val background = if (changed) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surface
+    val colors = MaterialTheme.colorScheme
+    val background = if (changed) colors.tertiaryContainer else colors.surface
+    val content = if (changed) colors.onTertiaryContainer else colors.onSurface
+    val labelColor = if (changed) colors.onTertiaryContainer else colors.onSurfaceVariant
     Column(Modifier.fillMaxWidth().background(background).padding(vertical = 6.dp, horizontal = 4.dp)) {
         if (label.isNotEmpty()) {
-            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(label, style = MaterialTheme.typography.labelMedium, color = labelColor)
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             cells.forEach { cell ->
                 Text(
                     cell,
                     modifier = Modifier.weight(1f),
+                    color = content,
                     style = if (header) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium,
                 )
             }

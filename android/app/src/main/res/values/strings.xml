@@ -23,6 +23,9 @@
     <string name="sign_in_open_again">Open sign-in page again</string>
     <string name="sign_in_no_browser">No browser can open the sign-in page.</string>
     <string name="sign_in_failed">Sign-in failed: %1$s</string>
+    <string name="sign_in_other_device">Sign in on another device</string>
+    <string name="sign_in_other_device_hint">Open this link in a browser on any device. Keep this screen open until the sign-in completes.</string>
+    <string name="copy_link">Copy link</string>
 
     <!-- Contact list -->
     <string name="search_hint">Search name, phone or email</string>
@@ -44,7 +47,10 @@
     <string name="synced_minutes">Synced %1$d min ago</string>
     <string name="synced_hours">Synced %1$d h ago</string>
     <string name="synced_days">Synced %1$d d ago</string>
-    <string name="conflicts_banner">%1$d conflicts</string>
+    <plurals name="conflicts_banner">
+        <item quantity="one">%1$d conflict</item>
+        <item quantity="other">%1$d conflicts</item>
+    </plurals>
     <string name="phone_permission_needed">The app needs access to your contacts to show them in the Contacts app.</string>
     <string name="phone_enable_failed">Cardvault could not add its account to the phone.</string>
 

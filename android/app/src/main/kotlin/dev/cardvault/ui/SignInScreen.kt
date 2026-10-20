@@ -14,12 +14,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -97,6 +101,7 @@ fun SignInScreen(state: AuthState, onSignIn: () -> Unit, onCancel: () -> Unit) {
                     OutlinedButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
                         Text(stringResource(R.string.cancel))
                     }
+                    OtherDeviceLink(state.signInUrl)
                 }
                 is AuthState.Failed -> {
                     Text(
@@ -123,4 +128,23 @@ private fun openCustomTab(context: Context, url: String): Boolean = try {
     true
 } catch (_: ActivityNotFoundException) {
     false
+}
+
+// The fork sign-in also works in a browser on another device, as in the Proton Drive CLI.
+@Composable
+private fun OtherDeviceLink(url: String) {
+    val clipboard = LocalClipboardManager.current
+    var shown by rememberSaveable { mutableStateOf(false) }
+    Spacer(Modifier.height(8.dp))
+    TextButton(onClick = { shown = !shown }) { Text(stringResource(R.string.sign_in_other_device)) }
+    if (shown) {
+        Text(
+            stringResource(R.string.sign_in_other_device_hint),
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(8.dp))
+        SelectionContainer { Text(url, style = MaterialTheme.typography.bodySmall) }
+        TextButton(onClick = { clipboard.setText(AnnotatedString(url)) }) { Text(stringResource(R.string.copy_link)) }
+    }
 }

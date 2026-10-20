@@ -182,6 +182,13 @@ class VCardParserTest {
     }
 
     @Test
+    fun cardWithOnlyUidRoundTrips() {
+        // The mirror base and local.vcf go through serialize/parse. A contact without content must not vanish there.
+        val empty = Contact(uid = "urn:uuid:only-uid", rev = 1709634030000L)
+        assertEquals(listOf(empty), VCard.parse(VCard.serialize(listOf(empty))).contacts)
+    }
+
+    @Test
     fun repeatedSingleValueFieldsKeepTheSecondAsExtra() {
         val c = one(card("UID:u", "FN:A", "TITLE:One", "TITLE:Two"))
         assertEquals("One", c.title)

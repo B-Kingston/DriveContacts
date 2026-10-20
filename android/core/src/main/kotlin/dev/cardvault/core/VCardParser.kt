@@ -336,7 +336,8 @@ internal object VCardParser {
             title = title, birthday = birthday, phones = phones, emails = emails, addresses = addresses,
             urls = urls, note = note, extras = extras,
         )
-        val isEmpty = contact.sameContentAs(Contact(uid = uid))
+        // A card with a UID is a contact even without other content: parse(serialize(x)) must give x back.
+        val isEmpty = uid.isEmpty() && contact.sameContentAs(Contact(uid = ""))
         return Pair(if (isEmpty) null else contact, dropped)
     }
 

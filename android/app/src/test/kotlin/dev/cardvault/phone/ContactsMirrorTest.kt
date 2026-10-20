@@ -110,4 +110,37 @@ class ContactsMirrorTest {
         assertFalse(run())
         assertTrue(phone.raws.isEmpty())
     }
+
+    @Test
+    fun emptyNewRawContactIsNeitherImportedNorDeleted() {
+        setUp()
+        val id = phone.addNew(Contact(uid = ""))
+        assertFalse(run())
+        assertTrue(local.snapshot().contacts.isEmpty())
+        assertEquals(listOf(id), phone.raws.map { it.rawContactId })
+    }
+
+    @Test
+    fun phoneDeleteOfContactWithoutContentSticks() {
+        // Seen on a device: the contact came back after the delete because the mirror base lost it.
+        setUp()
+        runBlocking { local.upsert(Contact(uid = "urn:uuid:blank")) }
+        run()
+        phone.markDeleted("urn:uuid:blank")
+        assertTrue(run())
+        assertTrue(local.snapshot().contacts.isEmpty())
+        assertTrue(phone.raws.isEmpty())
+        run()
+        assertTrue(phone.raws.isEmpty())
+    }
+
+    @Test
+    fun dirtyRowsAreClearedAfterThePass() {
+        setUp()
+        runBlocking { local.upsert(alice()) }
+        run()
+        phone.edit("urn:uuid:alice") { it.copy(note = "x") }
+        run()
+        assertFalse(phone.raws.single().dirty)
+    }
 }

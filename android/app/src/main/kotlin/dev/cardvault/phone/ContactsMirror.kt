@@ -30,17 +30,21 @@ class ContactsMirror(
         val assigned = LinkedHashMap<Long, String>()
         val seen = HashSet<String>()
         val phoneContacts = ArrayList<Contact>()
+        var liveRows = 0
         for (raw in current) {
             if (raw.deleted) continue
-            val uid = raw.sourceId?.takeIf { it.isNotEmpty() }
-                ?: Contact.newUid().also { assigned[raw.rawContactId] = it }
+            val sourceId = raw.sourceId?.takeIf { it.isNotEmpty() }
+            // A new raw contact without any content is not a contact yet. The mirror leaves it alone.
+            if (sourceId == null && raw.contact.sameContentAs(Contact(uid = ""))) continue
+            liveRows++
+            val uid = sourceId ?: Contact.newUid().also { assigned[raw.rawContactId] = it }
             if (!seen.add(uid)) continue
             val known = baseByUid[uid]
             val content = raw.contact.copy(uid = uid, extras = known?.extras ?: emptyList())
             val rev = if (known != null && known.sameContentAs(content)) known.rev else clock()
             phoneContacts += content.copy(rev = rev)
         }
-        val liveRows = current.count { !it.deleted }
+
 
         var attempts = 0
         while (true) {
@@ -57,6 +61,7 @@ class ContactsMirror(
                 liveRows != phoneContacts.size ||
                 !result.sameContentAs(phoneContacts)
             if (phoneDiffers) phone.write(result, current, assigned)
+            phone.clearDirty(current.filter { it.dirty && !it.deleted }.map { it.rawContactId })
             AtomicFiles.write(baseFile, VCard.serialize(result))
             return changed
         }
