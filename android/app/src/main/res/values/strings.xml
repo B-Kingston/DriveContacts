@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cardvault</string>
+
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="save">Save</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="keep">Keep</string>
+    <string name="remove">Remove</string>
+    <string name="try_again">Try again</string>
+    <string name="menu">Menu</string>
+    <string name="empty_value">(empty)</string>
+    <string name="unnamed_contact">(No name)</string>
+
+    <!-- Sign-in -->
+    <string name="sign_in_explanation">Your contacts are stored end-to-end encrypted in your Proton Drive.</string>
+    <string name="sign_in_disclosure">This is a third-party application not officially supported by Proton.</string>
+    <string name="sign_in_button">Sign in with Proton</string>
+    <string name="sign_in_waiting">Waiting for you to finish the sign-in in the browser.</string>
+    <string name="sign_in_open_again">Open sign-in page again</string>
+    <string name="sign_in_no_browser">No browser can open the sign-in page.</string>
+    <string name="sign_in_failed">Sign-in failed: %1$s</string>
+
+    <!-- Contact list -->
+    <string name="search_hint">Search name, phone or email</string>
+    <string name="clear_search">Clear search</string>
+    <string name="add_contact">Add contact</string>
+    <string name="list_empty">No contacts yet.</string>
+    <string name="list_no_match">No contact matches your search.</string>
+    <string name="menu_sync_now">Sync now</string>
+    <string name="menu_import">Import</string>
+    <string name="menu_phone_on">Show in phone Contacts</string>
+    <string name="menu_phone_off">Hide from phone Contacts</string>
+    <string name="menu_sign_out">Sign out</string>
+    <string name="sign_out_title">Sign out?</string>
+    <string name="sign_out_message">Local data on this device is removed. Your data in Proton Drive stays.</string>
+    <string name="sync_running">Syncing…</string>
+    <string name="sync_never">Not synced yet</string>
+    <string name="sync_error">Sync failed: %1$s</string>
+    <string name="synced_now">Synced just now</string>
+    <string name="synced_minutes">Synced %1$d min ago</string>
+    <string name="synced_hours">Synced %1$d h ago</string>
+    <string name="synced_days">Synced %1$d d ago</string>
+    <string name="conflicts_banner">%1$d conflicts</string>
+    <string name="phone_permission_needed">The app needs access to your contacts to show them in the Contacts app.</string>
+    <string name="phone_enable_failed">Cardvault could not add its account to the phone.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">Welcome to Cardvault</string>
+    <string name="onboarding_text">Show your contacts in the phone Contacts app, or import the contacts that you already have.</string>
+    <string name="onboarding_show_in_phone">Show in phone Contacts</string>
+    <string name="onboarding_import">Import existing contacts</string>
+    <string name="onboarding_not_now">Not now</string>
+
+    <!-- Detail and edit -->
+    <string name="new_contact">New contact</string>
+    <string name="edit_contact">Edit contact</string>
+    <string name="delete_contact_title">Delete contact?</string>
+    <string name="delete_contact_message">The contact is removed from this device and, after the next sync, from Proton Drive.</string>
+    <string name="discard_title">Discard changes?</string>
+    <string name="discard_message">Your changes are not saved.</string>
+    <string name="discard">Discard</string>
+    <string name="keep_editing">Keep editing</string>
+    <plurals name="other_properties_kept">
+        <item quantity="one">%1$d other property is kept</item>
+        <item quantity="other">%1$d other properties are kept</item>
+    </plurals>
+    <string name="field_formatted_name">Display name</string>
+    <string name="field_name">Name</string>
+    <string name="name_prefix">Prefix</string>
+    <string name="name_given">First name</string>
+    <string name="name_additional">Middle name</string>
+    <string name="name_family">Last name</string>
+    <string name="name_suffix">Suffix</string>
+    <string name="field_nickname">Nickname</string>
+    <string name="field_organization">Company</string>
+    <string name="field_department">Department</string>
+    <string name="field_title">Job title</string>
+    <string name="field_phone">Phone</string>
+    <string name="field_email">Email</string>
+    <string name="field_website">Website</string>
+    <string name="field_birthday">Birthday</string>
+    <string name="birthday_hint">YYYY-MM-DD</string>
+    <string name="field_note">Note</string>
+    <string name="field_type">Type</string>
+    <string name="custom_label">Label</string>
+    <string name="section_phones">Phones</string>
+    <string name="section_emails">Emails</string>
+    <string name="section_addresses">Addresses</string>
+    <string name="section_websites">Websites</string>
+    <string name="add_phone">Add phone</string>
+    <string name="add_email">Add email</string>
+    <string name="add_address">Add address</string>
+    <string name="add_website">Add website</string>
+    <string name="address_street">Street</string>
+    <string name="address_extended">Apartment, suite</string>
+    <string name="address_po_box">PO box</string>
+    <string name="address_postal_code">Postal code</string>
+    <string name="address_locality">City</string>
+    <string name="address_region">State, region</string>
+    <string name="address_country">Country</string>
+    <string name="kind_mobile">Mobile</string>
+    <string name="kind_home">Home</string>
+    <string name="kind_work">Work</string>
+    <string name="kind_main">Main</string>
+    <string name="kind_fax_home">Home fax</string>
+    <string name="kind_fax_work">Work fax</string>
+    <string name="kind_fax_other">Other fax</string>
+    <string name="kind_pager">Pager</string>
+    <string name="kind_other">Other</string>
+    <string name="kind_custom">Custom</string>
+
+    <!-- Conflicts -->
+    <string name="conflicts_title">Conflicts</string>
+    <string name="conflicts_empty">No open conflicts.</string>
+    <string name="compare_files">Compare files</string>
+    <string name="conflict_kind_fields">Changed on this device and on another device</string>
+    <string name="conflict_kind_deleted_locally">Deleted on this device, changed on another device</string>
+    <string name="conflict_kind_deleted_remotely">Deleted on another device, changed on this device</string>
+    <string name="conflict_deleted_locally_text">You deleted this contact on this device. It was changed on another device.</string>
+    <string name="conflict_deleted_remotely_text">This contact was deleted on another device. You changed it on this device.</string>
+    <string name="conflict_fields_text">Choose the value to keep for each field.</string>
+    <string name="this_device">This device</string>
+    <string name="proton_drive">Proton Drive</string>
+    <string name="original">Original</string>
+    <string name="show_original">Show original</string>
+    <string name="keep_all_device">Keep all from this device</string>
+    <string name="keep_all_drive">Keep all from Proton Drive</string>
+    <string name="apply">Apply</string>
+    <string name="compare_empty">No conflicting files are saved.</string>
+    <string name="compare_no_differences">The two files have no differences.</string>
+    <string name="badge_added">Added</string>
+    <string name="badge_removed">Removed</string>
+    <string name="badge_changed">Changed</string>
+
+    <!-- Import -->
+    <string name="import_title">Import contacts</string>
+    <string name="import_help">Google contacts that sync to this phone appear as a Google account in this list. For a Google account that is not on this phone, export a vCard at contacts.google.com and import the file.</string>
+    <string name="import_from_phone">From accounts on this phone</string>
+    <string name="import_permission_text">Cardvault needs access to your contacts to read the accounts on this phone.</string>
+    <string name="import_grant_permission">Allow access to contacts</string>
+    <string name="import_no_accounts">No other contacts accounts have contacts.</string>
+    <plurals name="import_contact_count">
+        <item quantity="one">%1$d contact</item>
+        <item quantity="other">%1$d contacts</item>
+    </plurals>
+    <string name="import_selected">Import selected</string>
+    <string name="import_vcard">Import from vCard file</string>
+    <string name="import_failed">The import failed.</string>
+    <string name="import_result_title">Import finished</string>
+    <string name="import_result_imported">Imported: %1$d</string>
+    <string name="import_result_duplicates">Skipped as duplicates: %1$d</string>
+    <string name="import_result_dropped">Photos and other properties not imported: %1$d</string>
+</resources>

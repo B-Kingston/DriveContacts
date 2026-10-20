@@ -1,0 +1,9 @@
+BEGIN:VCARD
+VERSION:3.0
+UID:urn:uuid:55555555-5555-4555-8555-555555555555
+N:Doe\; Jr\,;John\\;;;
+FN:John Doe
+ORG:Foo\, Inc.\;;R\&D
+ADR;TYPE=WORK:;;1 Main St\; Apt 2;Springfield\, IL;;62701;USA
+NOTE:Line1\nLine2\NLine3; semi\; comma\, back\\slash
+END:VCARD

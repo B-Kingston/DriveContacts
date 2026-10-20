@@ -1,0 +1,22 @@
+BEGIN:VCARD
+VERSION:4.0
+UID:urn:uuid:11111111-1111-4111-8111-111111111111
+REV:20240305T102030Z
+FN:Countess Ada Augusta Lovelace
+N:Lovelace;Ada;Augusta;Countess;
+NICKNAME:Ada\, Enchantress
+ORG:Analytical Engines Ltd;Research
+TITLE:Programmer
+BDAY:1815-12-10
+cv1.TEL:+44 20 7946 0000
+cv1.X-ABLabel:Boat
+TEL;TYPE=cell:+44 7700 900123
+TEL;TYPE=work:+44 20 7946 0001
+EMAIL;TYPE=x-other:ada@example.com
+EMAIL;TYPE=home:ada.home@example.com
+EMAIL;TYPE=work:ada@work.example.com
+ADR;TYPE=home:;;12 St James's Square;London;;SW1Y 4JH;United Kingdom
+URL:https://example.com/ada
+NOTE:First line\nSecond line
+CATEGORIES:myContacts,Friends
+END:VCARD

@@ -1,0 +1,10 @@
+BEGIN:VCARD
+VERSION:4.0
+UID:urn:uuid:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1
+REV:19700101T000000Z
+FN:Uri Phone
+TEL;TYPE=home:+1-555-0111
+TEL;TYPE=x-other:+1-555-0112
+cv1.TEL:+1-555-0113
+cv1.X-ABLabel:Satellite
+END:VCARD

@@ -1,0 +1,15 @@
+BEGIN:VCARD
+VERSION:4.0
+UID:urn:uuid:33333333-3333-4333-8333-333333333333
+REV:19700101T000000Z
+FN:Johnny Appleseed
+N:Appleseed;Johnny;;;
+TEL;TYPE=cell:+1 555 0100
+TEL;TYPE=home,fax:+1 555 0101
+TEL;TYPE=work,fax:+1 555 0102
+cv1.TEL:+1 555 0103
+cv1.X-ABLabel:Anniversary
+EMAIL;TYPE=x-other:johnny@example.com
+item6.X-ABRELATEDNAMES:Jane
+item6.X-ABLabel:_$!<Spouse>!$_
+END:VCARD

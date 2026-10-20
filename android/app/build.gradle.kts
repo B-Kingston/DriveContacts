@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.lifecycle.process)
     implementation(libs.browser)
     implementation(libs.work.runtime)
+    implementation(libs.navigation.compose)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

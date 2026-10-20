@@ -1,0 +1,21 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Apple Inc.//iOS 17.0//EN
+N:Appleseed;Johnny;;;
+FN:Johnny Appleseed
+UID:urn:uuid:33333333-3333-4333-8333-333333333333
+item1.TEL;type=pref:+1 555 0100
+item1.X-ABLabel:_$!<Mobile>!$_
+item2.TEL:+1 555 0101
+item2.X-ABLabel:_$!<HomeFAX>!$_
+item3.TEL:+1 555 0102
+item3.X-ABLabel:_$!<WorkFAX>!$_
+item4.TEL:+1 555 0103
+item4.X-ABLabel:_$!<Anniversary>!$_
+item5.EMAIL;type=INTERNET;type=pref:johnny@example.com
+item5.X-ABLabel:_$!<Other>!$_
+item6.X-ABRELATEDNAMES:Jane
+item6.X-ABLabel:_$!<Spouse>!$_
+PHOTO;ENCODING=b;TYPE=JPEG:/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoH
+ BwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/
+END:VCARD

@@ -1,0 +1,24 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Google Inc.//Google Contacts//EN
+UID:urn:uuid:11111111-1111-4111-8111-111111111111
+REV:2024-03-05T10:20:30Z
+N:Lovelace;Ada;Augusta;Countess;
+FN:Countess Ada Augusta Lovelace
+NICKNAME:Ada,Enchantress
+ORG:Analytical Engines Ltd;Research
+TITLE:Programmer
+BDAY:1815-12-10
+item1.TEL:+44 20 7946 0000
+item1.X-ABLabel:Boat
+TEL;TYPE=CELL:+44 7700 900123
+TEL;TYPE=WORK,VOICE:+44 20 7946 0001
+EMAIL;TYPE=INTERNET:ada@example.com
+EMAIL;TYPE=INTERNET,HOME:ada.home@example.com
+EMAIL;TYPE=INTERNET,WORK:ada@work.example.com
+ADR;TYPE=HOME:;;12 St James's Square;London;;SW1Y 4JH;United Kingdom
+item2.URL:https://example.com/ada
+item2.X-ABLabel:_$!<HomePage>!$_
+NOTE:First line\nSecond line
+CATEGORIES:myContacts,Friends
+END:VCARD

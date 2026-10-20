@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:4.0
+UID:urn:uuid:66666666-6666-4666-8666-666666666666
+REV:19700101T000000Z
+FN:Zed
+X-CUSTOM-FIELD:some value
+item1.X-ABDATE;type=pref:2000-01-01
+item1.X-ABLabel:Anniversary
+IMPP;X-SERVICE-TYPE=Skype:skype:zed.example
+GENDER:M
+X-ABLabel:Orphan label
+END:VCARD

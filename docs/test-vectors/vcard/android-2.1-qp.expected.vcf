@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:4.0
+UID:urn:uuid:22222222-2222-4222-8222-222222222222
+REV:20240101T120000Z
+FN:Jürgen Müller
+N:Müller;Jürgen;;;
+TEL;TYPE=cell:+49 170 1234567
+TEL;TYPE=home:+49 30 1234
+TEL;TYPE=work,fax:+49 30 5678
+TEL;TYPE=main:+49 30 9999
+EMAIL;TYPE=x-other:jurgen@example.de
+ADR;TYPE=home:;;Straße 1;Köln;;50667;Deutschland
+NOTE:Zeile 1\nZeile 2 mit äöü und weiter
+END:VCARD
