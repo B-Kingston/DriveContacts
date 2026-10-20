@@ -1,6 +1,6 @@
-# Cardvault: data format and sync contract (v1)
+# DriveContacts: data format and sync contract (v1)
 
-This document is the contract for the Android app and the later iOS app. Both platforms must give the same result for the same input.
+This document is the contract for every DriveContacts client. All clients must give the same result for the same input.
 
 Terms:
 - **Local**: the contacts that the app keeps on the device.
@@ -11,10 +11,10 @@ Terms:
 
 ## 1. Drive layout
 
-- Folder: `My files/Cardvault`.
-- File: `My files/Cardvault/contacts.vcf`, media type `text/vcard`.
+- Folder: `My files/DriveContacts`.
+- File: `My files/DriveContacts/contacts.vcf`, media type `text/vcard`.
 - One file holds all contacts. Each change uploads a new revision of this file.
-- The app finds the folder and the file by name. It lists only the direct children of `My files` and of `Cardvault`. It never walks the tree recursively.
+- The app finds the folder and the file by name. It lists only the direct children of `My files` and of `DriveContacts`. It never walks the tree recursively.
 
 ## 2. File format
 
@@ -49,12 +49,15 @@ END:VCARD
 - `N` is written when at least one component is not empty.
 - `ORG` is written when the organization or the department is not empty. The `;<department>` part is written only when the department is not empty.
 - Text escaping in values: `\` → `\\`, newline → `\n`, `,` → `\,`, `;` → `\;`. Structured values (`N`, `ORG`, `ADR`) escape each component and join them with a literal `;`.
+- The writer trims the UID, custom labels and the nickname. It writes the birthday in the form that the parser gives (`BDAY` rule in 2.3). A custom label that is empty after trimming gives no group; the value is written with `TYPE=x-other`.
+- Extra lines contain no `CHARSET` and no `QUOTED-PRINTABLE` encoding (see 2.3).
 - A typed value with a custom label uses an Apple/Google group. The writer numbers the groups `cv1`, `cv2`, … per card, in output order:
   ```
   cv1.TEL:+1 555 0100
   cv1.X-ABLabel:Boat
   ```
 - Two serializations of equal contact lists give the same bytes. The sync engine compares bytes to decide if an upload is necessary.
+- `canonical(contact)` is the contact that the parser reads from the contact's own serialization, with the same `rev`. `parse(serialize([canonical(c)]))` has the same content as `canonical(c)`.
 
 ### 2.2 Type mapping
 
@@ -80,8 +83,11 @@ Rules for reading:
 
 The parser reads vCard 2.1, 3.0 and 4.0. This covers Google Contacts exports (3.0), Android exports (2.1) and Apple exports (3.0).
 - It accepts CRLF, LF and CR line ends.
+- Version: the version of a card is the value of the last `VERSION` line before the current line in the same card. A card starts without a version. The app's own writer always writes `VERSION` right after `BEGIN`. Lines before the `VERSION` line are read as not 4.0.
+- Input encoding: a UTF-16 LE or BE byte order mark selects that encoding, and a UTF-8 byte order mark is skipped. Otherwise the parser splits lines on the bytes and decodes each value with its `CHARSET` parameter (for example ISO-8859-1 or Shift_JIS). Without the parameter, or with an unknown name, it uses UTF-8. A plain (not quoted-printable) value is always UTF-8 when the card version is 4.0 and for UTF-16 input. A quoted-printable value uses its `CHARSET` in every case, because old files of this app hold such lines in 4.0 cards.
+- Nested cards (vCard 2.1): a `BEGIN:VCARD` right after an `AGENT` property line starts a nested card. An `AGENT` property whose value is `BEGIN:VCARD` (ignoring case and surrounding white space) starts a nested card too. The parser drops the `AGENT` line and all lines up to the matching `END:VCARD`, and it keeps the properties of the outer card that follow. Nested cards can nest further. Any other `BEGIN:VCARD` before an `END:VCARD` ends the card in progress and starts a new card.
 - It unfolds lines that start with a space or a tab.
-- It accepts vCard 2.1 quoted-printable values (`ENCODING=QUOTED-PRINTABLE`, `QUOTED-PRINTABLE` bare parameter), including soft line breaks (`=` at the end of the line) and `CHARSET=`. It decodes the bytes as the given charset (default UTF-8).
+- It accepts vCard 2.1 quoted-printable values (`ENCODING=QUOTED-PRINTABLE`, or the bare parameter `QUOTED-PRINTABLE`), including soft line breaks (`=` at the end of a line). A soft break does not continue into an empty line or into a `BEGIN:VCARD` or `END:VCARD` line (any case). In a card whose version is 4.0 (see "Version" above), a line that ends in `=` never opens a soft break, because vCard 4.0 has no quoted-printable; a line that starts with a space or a tab after it is a normal fold. The parser decodes the bytes with the `CHARSET` parameter (default UTF-8). It decodes quoted-printable values of extras too. Extra lines keep neither `CHARSET` nor the quoted-printable encoding. A new line in a decoded extra is written as `\n`.
 - It accepts vCard 2.1 bare type parameters (`TEL;CELL;PREF:`).
 - Property names and parameter names are case-insensitive. Parameter values can be quoted. A `:`, `;` or `,` inside quotes is literal.
 - It removes the group prefix (`item1.`) before it matches a property name. It uses the group only to join `X-ABLabel` to its property.
@@ -89,12 +95,18 @@ The parser reads vCard 2.1, 3.0 and 4.0. This covers Google Contacts exports (3.
 - `ORG`: component 1 is the organization, component 2 is the department. Other components are dropped.
 - `BDAY`: `YYYYMMDD` → `YYYY-MM-DD`; `--MMDD` → `--MM-DD`; `YYYY-MM-DD` and `--MM-DD` stay. A date-time keeps only the date part. Other text stays unchanged.
 - `REV`: the parser accepts `yyyyMMdd'T'HHmmss'Z'`, ISO-8601 instants and `yyyy-MM-dd'T'HH:mm:ss'Z'`. A value it cannot read gives epoch 0.
-- `PHOTO`, `LOGO`, `SOUND`, `KEY` with binary or `data:` content are dropped. The parser reports the number of dropped properties.
+- `PHOTO`, `LOGO`, `SOUND`, `KEY` are dropped unless the value is a URI that is not a `data:` URI and has no `ENCODING` parameter. The parser counts the dropped properties and does not keep their values.
 - `PRODID`, `VERSION`, `BEGIN`, `END` are not stored.
-- All other properties (for example `IMPP`, `RELATED`, `ANNIVERSARY`, `GENDER`, `CATEGORIES`, `X-*`) are kept as extras: the unfolded line, verbatim, with its group prefix. A grouped `X-ABLabel` whose group has a known property is not an extra.
+- All other properties (for example `IMPP`, `RELATED`, `ANNIVERSARY`, `GENDER`, `CATEGORIES`, `X-*`) are kept as extras: the unfolded line with its group prefix, verbatim except that quoted-printable values are decoded and `CHARSET` and the quoted-printable encoding are removed (see above). A grouped `X-ABLabel` whose group has a known property is not an extra.
 - `FN` missing: the parser makes it from `N` (`prefix given additional family suffix`, single spaces, trimmed), then from the organization, then from the first email, then from the first phone. If all are empty, `FN` is empty.
-- `UID` missing: the parser makes `urn:uuid:<random UUID v4, lowercase>`.
-- Duplicate UID in one file: the first card keeps the UID. Each later card gets a new random UID.
+- `UID` missing: the parser derives the UID from the card, as follows.
+  - **Logical lines.** A logical line is a property line after unfolding. Fold: a line break (CRLF, LF or CR) followed by a space or a tab is removed together with that one space or tab. Soft break: in a quoted-printable line (not in a 4.0 card), a trailing `=` and the line break after it are removed. The bytes are as in the file, or UTF-8 for UTF-16 input.
+  - **Hash `H`.** `H` is the SHA-256 of the concatenation, for each logical line of the card in file order, of the line bytes followed by one LF byte. These lines are included: all property lines of the card (`VERSION` and `PRODID` too), all lines of nested cards with their `BEGIN:VCARD`/`END:VCARD` lines, and the `AGENT` line that opens a nested card.
+  - **Excluded from `H`.** The `BEGIN:VCARD` and `END:VCARD` lines of the card itself; empty lines; lines without a colon outside quotes; lines with an empty property name; text outside the card.
+  - **Binary lines.** For a dropped `PHOTO`, `LOGO`, `SOUND` or `KEY` line, only the bytes before its first colon outside quotes (the head) are hashed, plus LF.
+  - **UID.** For occurrence number `n` (counted from 0, per `H`) the UID is `urn:uuid:` plus a UUID built from the first 16 bytes of SHA-256(`H` ‖ `n` as 4 bytes big-endian). The version nibble is 5 and the variant bits are `10`, in lowercase hex. Identical cards without UID get `n` = 0, 1, 2, …
+- Duplicate UID in one file: the first card keeps the UID. Each later card gets a derived UID as above, with `H` of its own lines. If a derived UID is already used, the next `n` is tried.
+- Parsing is a pure function: the same bytes always give the same contacts and UIDs.
 - A card without `END:VCARD` at the end of the file is still read.
 
 ## 3. Contact model
@@ -190,24 +202,30 @@ Resolution:
 - `DiffRow(label, left: List<String>, right: List<String>, changed: Boolean)`. There is one row per model field, in model order. A list field gives one display string per item (for example `Mobile: +1 555 0100`). An absent side gives an empty list.
 - The list is sorted by display name (case-insensitive), then by UID.
 
+### 4.5 Edits in the app
+
+Saving an edit runs `merge3(contact when the form opened, current contact, form)` under the repository lock, so a change that a sync brought in during the edit stays. The form wins on a field that both sides changed.
+
 ## 5. Drive sync algorithm
 
 State, saved after each step that changes it: `folderUid`, `fileUid`, `scopeId`, `eventCursor`, `baseRevisionUid`, the base bytes, `lastSyncAt`, `lastError`.
 
 One sync at a time per device (process mutex and a unique WorkManager job).
 
+Before each sync the app checks, under the sync lock, that the local data belongs to the signed-in user. If not, it first deletes the local data, the phone mirror and the Drive cache. Sign-out cancels a running sync and always completes its wipe.
+
 1. **Find or create the remote file** when `fileUid` is unknown:
    - `root = getMyFilesFolder()`; `scopeId = root.treeEventScopeId`.
-   - Find a folder `Cardvault` (not trashed) among the children of `root`. If there is none, create it. If the create gives a name conflict, list again and use the existing folder.
+   - Find a folder `DriveContacts` (not trashed) among the children of `root`. If there is none, create it. If the create gives a name conflict, list again and use the existing folder.
    - Find a file `contacts.vcf` (not trashed) in the folder.
      - Found: set `fileUid`. `baseRevisionUid` stays empty, so step 3 downloads it. Base content is empty, so the first merge is a two-way merge.
-     - Not found: upload the local content as a new file. A name conflict gives the existing node: use it as "found". On success: `base = uploaded bytes`, `baseRevisionUid = result.revisionUid`.
+     - Not found: upload the local content as a new file. A name conflict with an unfinished upload of another client: create again and replace that upload. A name conflict with a file: use that file as "found". On success: `base = uploaded bytes`, `baseRevisionUid = result.revisionUid`.
    - If `eventCursor` is empty, get the latest cursor: `enumerateEvents(scopeId, null)` gives one `CursorAdvanced` event.
 2. **Read events** from `eventCursor`. The remote is "maybe changed" when an event names `fileUid` or `folderUid`, or on `ContinuityLost`, or when `baseRevisionUid` is empty. Save the id of the last event as the new cursor only after step 3 completes.
 3. **Read the remote** when it is "maybe changed": `getNode(fileUid)`.
    - Absent or trashed: forget `fileUid` and `baseRevisionUid`, and go to step 1. The local contacts are kept and uploaded again.
    - `activeRevision.uid == baseRevisionUid`: no remote change.
-   - Else: download that revision, parse it, `merge3(base, localSnapshot, remote)`. Write the merged contacts to local. If the local contacts changed while the download ran, merge again: `merge3(localSnapshot, localNow, merged)`. Save the conflicts. Set `base = downloaded bytes`, `baseRevisionUid = activeRevision.uid`.
+   - Else: download that revision, parse it, `merge3(base, localSnapshot, remote)`. Write the merged contacts to local. If the local contacts changed while the download ran, merge again: `merge3(localSnapshot, localNow, merged)`. Save the conflicts with the two inputs of the last merge as the conflict files. Set `base = downloaded bytes`, `baseRevisionUid = activeRevision.uid`.
 4. **Upload** when `serialize(local) != base bytes`: upload a new revision with `currentActiveRevisionUid = baseRevisionUid`. The Drive API rejects the revision when the given revision is no longer the active one (HTTP 409).
    - On success: `base = uploaded bytes`, `baseRevisionUid = result.revisionUid`.
    - On failure: `getNode(fileUid)`. If the active revision is not `baseRevisionUid`, another device uploaded first: go to step 3 (at most 3 times per sync). Else report the error.
@@ -215,23 +233,29 @@ One sync at a time per device (process mutex and a unique WorkManager job).
 
 Triggers:
 - App in the foreground: every 30 seconds, and 3 seconds after the last local edit.
-- Background: a periodic WorkManager job every 15 minutes, with a network constraint.
+- A request during a running sync queues one more run. A request never cancels a running sync.
+- Background: a periodic WorkManager job every 15 minutes, with a network constraint, scheduled at sign-in.
 - Android sync adapter: `onPerformSync` (for example after an edit in the phone contacts app).
-- Failures use exponential backoff (WorkManager backoff, 30 s start).
+- Network, transport and HTTP 429/5xx failures retry with exponential backoff (WorkManager backoff, 30 s start). Other failures wait for the next trigger. Every failure goes to `lastError`.
 
 The app never polls `getNode` without an event, except in step 1 and in the retry of step 4.
 
 ## 6. Phone contacts mirror (Android)
 
-- Account type `dev.cardvault.account`, account name = the user's primary email address.
+- Account type `dev.drivecontacts.account`, account name = the user's primary email address. The account holds a random token (account user data) that identifies this instance of the account.
+- The account type declares an edit schema (`android.provider.CONTACTS_STRUCTURE`) with the mapped kinds only.
 - Each raw contact of this account has `SOURCE_ID = uid`.
 - `mirror(local)`:
-  1. Read all raw contacts of the account. A raw contact with `DELETED = 1` is a deletion. A raw contact without `SOURCE_ID` is new: it gets a new UID.
-  2. For each phone contact, copy `extras` from the mirror base (the phone store cannot keep them).
-  3. `merge3(mirrorBase, local, phone)`. Field conflicts take the phone value (the provisional value) and are not shown to the user.
-  4. Write the result to local when it changed.
-  5. Write the result to the phone store with `CALLER_IS_SYNCADAPTER = true`: insert, update (replace all data rows of the raw contact) or delete raw contacts. Purge the deleted raw contacts.
-  6. `mirrorBase = result`.
+  1. Read the raw contacts of the account. A raw contact with `DELETED = 1` is a deletion. The read fails when the account is missing or the raw contacts change during the read.
+  2. Give each raw contact that has content but no `SOURCE_ID` a new UID. Write these `SOURCE_ID` values to the phone store, then read again.
+  3. The mirror base is empty when its token is not the account token, or when no base contact has a raw contact in the account (the phone store was cleared). A base without a token (older versions) takes the current token.
+  4. Make each phone contact canonical (2.1). Copy `extras` from the mirror base (the phone store cannot keep them).
+  5. `merge3(mirrorBase, local, phone)`. Field conflicts take the phone value (the provisional value) and are not shown to the user.
+  6. Write the result to local when it changed.
+  7. Write the result to the phone store with `CALLER_IS_SYNCADAPTER = true`: insert, update or delete raw contacts, and purge the deleted raw contacts. An update changes only the mapped data rows (the first row of a single field; all rows of the kind when the field is empty) and keeps `IS_PRIMARY`/`IS_SUPER_PRIMARY` on unchanged values. Each change first checks that the `VERSION` of the raw contact is unchanged since the read. If not, the pass fails and the next pass repeats it.
+  8. Save the mirror base when it changed, then its token.
+- A pass is skipped when local and the raw contacts (ids, versions, `DIRTY`, `DELETED`) are unchanged since the last pass that wrote nothing.
+- A failed pass goes to `lastError`. The Drive sync continues.
 - Data row mapping:
 
 | Model | ContactsContract |
@@ -271,13 +295,14 @@ Rules:
 | `contacts/local.vcf` | Local contacts, canonical serialization |
 | `contacts/base.vcf` | Base bytes (exact remote bytes) |
 | `contacts/mirror-base.vcf` | Mirror base |
+| `contacts/mirror-base.account` | Token of the phone account that the mirror base belongs to |
 | `contacts/conflicts.json` | Open conflicts |
 | `contacts/conflict-local.vcf`, `contacts/conflict-remote.vcf` | The two files of the last merge that gave conflicts (for the side-by-side file view) |
 | `sync-state.json` | Drive sync state (section 5) |
 | `session.bin` | Session secrets, AES-GCM with an Android Keystore key |
 | `drive-cache.sqlite` | Drive SDK cache, encrypted with `cacheEncryptionKey` |
 
-All writes are atomic (write a temporary file, then rename).
+All writes are atomic (write a temporary file, then rename). The app deletes `session.bin` only when the Keystore rejects its bytes, or when the user taps "Try again" after a second failed read.
 
 ## 9. Sign-in and API use
 
@@ -288,7 +313,9 @@ All writes are atomic (write a temporary file, then rename).
   4. The response gives `UID`, `AccessToken`, `RefreshToken`, `UserID`, `Payload`. `Payload` is base64 of `nonce(12) || ciphertext || tag(16)`, AES-256-GCM, AAD `fork`. The plaintext is JSON with `keyPassword`.
 - `keyPassword` unlocks the user keys. Address keys with `Token` and `Signature`: decrypt `Token` with the user keys, verify `Signature` (detached) with the user keys, and use the plaintext as the address key passphrase. Address keys without `Token`: use `keyPassword`.
 - The Drive SDK gets the unlocked address keys as binary (serialized) OpenPGP keys.
-- Every request has `x-pm-appversion: external-drive-cardvault@<version>-<channel>`. Authenticated requests also have `x-pm-uid` and `Authorization: Bearer <AccessToken>`.
-- Token refresh: `POST /auth/v4/refresh` with `{"ResponseType":"token","GrantType":"refresh_token","RefreshToken":…,"RedirectURI":"https://proton.me"}`. Only one refresh runs at a time. A 4xx answer other than 429 signs the user out.
-- The sign-in screen shows: "This is a third-party application not officially supported by Proton."
-- The app does not use Proton logos or trademarks in its name or icon.
+- Every request has `x-pm-appversion: external-drive-drivecontacts@<version>-<channel>`. Authenticated requests also have `x-pm-uid` and `Authorization: Bearer <AccessToken>`.
+- Token refresh: `POST /auth/v4/refresh` with `{"ResponseType":"token","GrantType":"refresh_token","RefreshToken":…,"RedirectURI":"https://proton.me"}`. Only one refresh runs at a time. The refresh request and the save of its tokens cannot be cancelled. HTTP 400, 401 and 422 sign the user out. Other answers keep the session.
+- The account API client pins the same TLS keys as ProtonCore.
+- A sign-in that fails or is cancelled revokes its session.
+- Unlocked keys are cached for at most 1 hour. When the keys no longer unlock (for example after a password change), the user is signed out.
+- Branding (Proton Drive SDK guidelines): the sign-in screen and the About dialog say "This is a third-party application not officially supported by Proton." The app uses no Proton logos, trademarks or design elements.

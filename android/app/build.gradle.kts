@@ -6,20 +6,50 @@ plugins {
 }
 
 android {
-    namespace = "dev.cardvault"
+    namespace = "dev.drivecontacts"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "dev.cardvault"
+        applicationId = "dev.drivecontacts"
         minSdk = 29
         targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
         // Required by the Proton Drive SDK usage guidelines: external-drive-{name}@{semver}-{channel}.
-        buildConfigField("String", "PROTON_APP_VERSION", "\"external-drive-cardvault@0.1.0-alpha\"")
+        buildConfigField("String", "PROTON_APP_VERSION", "\"external-drive-drivecontacts@0.1.0-alpha\"")
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
+    }
+
+    // Release signing only when all four values are set (Gradle properties or environment).
+    val releaseSigning = listOf("storeFile", "storePassword", "keyAlias", "keyPassword").associateWith { name ->
+        providers.gradleProperty("drivecontacts.$name")
+            .orElse(providers.environmentVariable("DRIVECONTACTS_" + name.replace(Regex("([A-Z])"), "_$1").uppercase()))
+            .orNull
+    }
+    val hasReleaseSigning = releaseSigning.values.all { !it.isNullOrEmpty() }
+    if (hasReleaseSigning) {
+        signingConfigs.create("release") {
+            storeFile = file(releaseSigning.getValue("storeFile")!!)
+            storePassword = releaseSigning.getValue("storePassword")
+            keyAlias = releaseSigning.getValue("keyAlias")
+            keyPassword = releaseSigning.getValue("keyPassword")
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (hasReleaseSigning) signingConfig = signingConfigs.getByName("release")
+        }
+    }
+
+    testOptions {
+        // The unit tests call android.util.Log.
+        unitTests.isReturnDefaultValues = true
     }
 
     buildFeatures {

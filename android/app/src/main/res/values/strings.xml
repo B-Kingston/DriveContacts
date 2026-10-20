@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Cardvault</string>
+    <string name="app_name">DriveContacts</string>
 
     <string name="back">Back</string>
     <string name="cancel">Cancel</string>
@@ -17,7 +17,7 @@
 
     <!-- Sign-in -->
     <string name="sign_in_explanation">Your contacts are stored end-to-end encrypted in your Proton Drive.</string>
-    <string name="sign_in_disclosure">This is a third-party application not officially supported by Proton.</string>
+    <string name="sign_in_disclosure">Unofficial app. This is a third-party application not officially supported by Proton.</string>
     <string name="sign_in_button">Sign in with Proton</string>
     <string name="sign_in_waiting">Waiting for you to finish the sign-in in the browser.</string>
     <string name="sign_in_open_again">Open sign-in page again</string>
@@ -38,6 +38,8 @@
     <string name="menu_phone_on">Show in phone Contacts</string>
     <string name="menu_phone_off">Hide from phone Contacts</string>
     <string name="menu_sign_out">Sign out</string>
+    <string name="menu_about">About</string>
+    <string name="about_text">Unofficial app. This is a third-party application not officially supported by Proton. It is not made or endorsed by Proton AG.\n\nSource code and license (GPLv3): github.com/B-Kingston/DriveContacts</string>
     <string name="sign_out_title">Sign out?</string>
     <string name="sign_out_message">Local data on this device is removed. Your data in Proton Drive stays.</string>
     <string name="sync_running">Syncing…</string>
@@ -52,10 +54,12 @@
         <item quantity="other">%1$d conflicts</item>
     </plurals>
     <string name="phone_permission_needed">The app needs access to your contacts to show them in the Contacts app.</string>
-    <string name="phone_enable_failed">Cardvault could not add its account to the phone.</string>
+    <string name="phone_enable_failed">DriveContacts could not add its account to the phone.</string>
+    <string name="load_failed">DriveContacts could not read its contacts: %1$s</string>
+    <string name="phone_disable_failed">DriveContacts could not remove its account from the phone.</string>
 
     <!-- Onboarding -->
-    <string name="onboarding_title">Welcome to Cardvault</string>
+    <string name="onboarding_title">Welcome to DriveContacts</string>
     <string name="onboarding_text">Show your contacts in the phone Contacts app, or import the contacts that you already have.</string>
     <string name="onboarding_show_in_phone">Show in phone Contacts</string>
     <string name="onboarding_import">Import existing contacts</string>
@@ -69,6 +73,9 @@
     <string name="discard_title">Discard changes?</string>
     <string name="discard_message">Your changes are not saved.</string>
     <string name="discard">Discard</string>
+    <string name="save_failed">The contact could not be saved.</string>
+    <string name="delete_failed">The contact could not be deleted.</string>
+    <string name="resolve_failed">The conflict could not be resolved.</string>
     <string name="keep_editing">Keep editing</string>
     <plurals name="other_properties_kept">
         <item quantity="one">%1$d other property is kept</item>
@@ -146,7 +153,7 @@
     <string name="import_title">Import contacts</string>
     <string name="import_help">Google contacts that sync to this phone appear as a Google account in this list. For a Google account that is not on this phone, export a vCard at contacts.google.com and import the file.</string>
     <string name="import_from_phone">From accounts on this phone</string>
-    <string name="import_permission_text">Cardvault needs access to your contacts to read the accounts on this phone.</string>
+    <string name="import_permission_text">DriveContacts needs access to your contacts to read the accounts on this phone.</string>
     <string name="import_grant_permission">Allow access to contacts</string>
     <string name="import_no_accounts">No other contacts accounts have contacts.</string>
     <plurals name="import_contact_count">

@@ -26,16 +26,16 @@
     </queries>
 
     <application
-        android:name="dev.cardvault.CardvaultApp"
+        android:name="dev.drivecontacts.DriveContactsApp"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Cardvault">
+        android:theme="@style/Theme.DriveContacts">
 
         <activity
-            android:name="dev.cardvault.ui.MainActivity"
+            android:name="dev.drivecontacts.ui.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize">
@@ -45,9 +45,9 @@
             </intent-filter>
         </activity>
 
-        <!-- Account type dev.cardvault.account: owns the raw contacts that mirror the Drive contacts. -->
+        <!-- Account type dev.drivecontacts.account: owns the raw contacts that mirror the Drive contacts. -->
         <service
-            android:name="dev.cardvault.phone.AuthenticatorService"
+            android:name="dev.drivecontacts.phone.AuthenticatorService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -58,7 +58,7 @@
         </service>
 
         <service
-            android:name="dev.cardvault.phone.ContactsSyncService"
+            android:name="dev.drivecontacts.phone.ContactsSyncService"
             android:exported="true"
             android:permission="android.permission.BIND_SYNC_ADAPTER"
             tools:ignore="ExportedService">
@@ -68,6 +68,9 @@
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter" />
+            <meta-data
+                android:name="android.provider.CONTACTS_STRUCTURE"
+                android:resource="@xml/contacts" />
         </service>
 
         <service

@@ -14,7 +14,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Cardvault"
+rootProject.name = "DriveContacts"
 
 include(":core")
 include(":app")

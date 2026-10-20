@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sign_in_other_device_warning">Whoever opens this link first signs in with their own Proton account and gets access to it. Open it only on your own device.</string>
+</resources>
