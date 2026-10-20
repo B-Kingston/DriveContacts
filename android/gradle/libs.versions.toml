@@ -1,0 +1,47 @@
+[versions]
+agp = "8.9.1"
+kotlin = "2.2.21"
+coroutines = "1.10.2"
+serialization = "1.9.0"
+proton-drive-sdk = "0.31.1"
+proton-core = "36.6.0"
+android-golib = "2.10.0-2"
+compose-bom = "2025.06.01"
+activity-compose = "1.10.1"
+lifecycle = "2.9.1"
+browser = "1.8.0"
+work = "2.10.0"
+okhttp = "4.12.0"
+junit = "4.13.2"
+
+[libraries]
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+proton-drive-sdk = { module = "me.proton.drive:sdk", version.ref = "proton-drive-sdk" }
+proton-core-network-data = { module = "me.proton.core:network-data", version.ref = "proton-core" }
+proton-core-network-domain = { module = "me.proton.core:network-domain", version.ref = "proton-core" }
+proton-core-domain = { module = "me.proton.core:domain", version.ref = "proton-core" }
+proton-core-util-kotlin = { module = "me.proton.core:util-kotlin", version.ref = "proton-core" }
+proton-crypto-golib = { module = "me.proton.crypto:android-golib", version.ref = "android-golib" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-material-icons = { module = "androidx.compose.material:material-icons-extended" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycle" }
+browser = { module = "androidx.browser:browser", version.ref = "browser" }
+work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

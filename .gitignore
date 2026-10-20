@@ -1,0 +1,9 @@
+vendor/
+**/build/
+**/.gradle/
+android/local.properties
+android/.kotlin/
+*.apk
+*.aab
+.idea/
+.DS_Store
