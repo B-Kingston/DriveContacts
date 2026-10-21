@@ -47,3 +47,18 @@
 -keepclasseswithmembers class dev.drivecontacts.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
+
+# Retrofit 2.9.0 (pulled in by ProtonCore network) predates its own R8 full-mode rules. Without them
+# R8 drops the generic signatures of these types, and every suspend API call fails with
+# "Class cannot be cast to ParameterizedType". These are the rules later Retrofit versions ship.
+-keepattributes Signature, InnerClasses, EnclosingMethod
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations, AnnotationDefault
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+-if interface * { @retrofit2.http.* public *** *(...); }
+-keep,allowoptimization,allowshrinking,allowobfuscation class <3>
+-dontwarn retrofit2.**
